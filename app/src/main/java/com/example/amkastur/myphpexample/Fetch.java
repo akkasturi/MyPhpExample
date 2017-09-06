@@ -8,13 +8,17 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 public class Fetch extends AppCompatActivity {
 
     TextView mFetchText;
-    ListView mvPetsList;
+    ListView mPetsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +26,7 @@ public class Fetch extends AppCompatActivity {
         setContentView(R.layout.activity_fetch);
 
         mFetchText = (TextView) findViewById(R.id.tvFetch);
-        mvPetsList = (ListView) findViewById(R.id.lvShowPetRows);
+        mPetsList = (ListView) findViewById(R.id.lvShowPetRows);
 
         String petRows;
 
@@ -55,19 +59,27 @@ public class Fetch extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            // mAlerDialog = new AlertDialog.Builder(mContext).create();
-            //mAlerDialog.setTitle("Login Status");
-            //super.onPreExecute();
-        }
+         }
 
         @Override
         protected void onPostExecute(String aVoid) {
-            mFetchText.setText(aVoid);
+            //mFetchText.setText(aVoid);
+            String rows="";
+            
+            try {
+                JSONArray jArray = new JSONArray(aVoid);
 
-            /* mAlerDialog.setMessage(aVoid);
-                mAlerDialog.show();
-            }*/
+                for(int i=0;i<jArray.length();i++){
+                    JSONObject json_data = jArray.getJSONObject(i);
+                    rows = "name : " + json_data.getString("name") +
+                            ", owner : " + json_data.getString("owner") +
+                            ", password: " + json_data.getString("password");
 
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            mFetchText.setText(rows);
         }
 
         @Override
