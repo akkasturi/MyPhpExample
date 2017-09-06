@@ -1,5 +1,10 @@
 package com.example.amkastur.myphpexample;
 
+/**
+ *  THIS CLASS IS NOT USED ANY MORE. JUST HERE FOR REFERENCE.
+ *  Real code in respect classes, extended from AsyncTask<>
+ */
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -27,6 +32,7 @@ public class BackgroundWorker extends AsyncTask<String, Object, String> {
 
     private Context mContext ;
     private AlertDialog mAlerDialog;
+    private boolean mIsFetch = false;
 
     BackgroundWorker(Context context){
         mContext = context;
@@ -52,7 +58,7 @@ public class BackgroundWorker extends AsyncTask<String, Object, String> {
 
             InputStream inputStream = httpURLConnection.getInputStream();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "iso-8859-1"));
-            String result=null;
+            String result="";
             String line;
 
             while ((line = bufferedReader.readLine()) != null) {
@@ -70,7 +76,7 @@ public class BackgroundWorker extends AsyncTask<String, Object, String> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return "a1";
     }
 
     @Override
@@ -79,7 +85,7 @@ public class BackgroundWorker extends AsyncTask<String, Object, String> {
         String loginUrl = "http://helpingapps.in/php/login.php";
         String registerUrl = "http://helpingapps.in/php/register.php";
         String fetchPetUrl = "http://helpingapps.in/php/fetchPet.php";
-        String result = null;
+        String result;
 
         if (type.equals("login")) {
             String username =  voids[1];
@@ -112,12 +118,26 @@ public class BackgroundWorker extends AsyncTask<String, Object, String> {
                 e.printStackTrace();
             }
 
+            result = executePhp(registerUrl, postData);
+
+            return result;
+        } else if (type.equals("fetch")) {
+
+            String postData = null;
+
+            try {
+                postData = URLEncoder.encode("table_name", "UTF-8") + "=" + URLEncoder.encode("pet", "UTF-8");
+                mIsFetch = true;
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
             result = executePhp(fetchPetUrl, postData);
 
             return result;
         }
 
-        return null;
+        return "a2";
     }
 
     @Override
@@ -129,8 +149,14 @@ public class BackgroundWorker extends AsyncTask<String, Object, String> {
 
     @Override
     protected void onPostExecute(String aVoid) {
-        mAlerDialog.setMessage(aVoid);
-        mAlerDialog.show();
+        if(mIsFetch) {
+            mAlerDialog.setMessage("Fetched : " + aVoid);
+            mAlerDialog.show();
+        }else {
+            mAlerDialog.setMessage(aVoid);
+            mAlerDialog.show();
+        }
+
         //super.onPostExecute(aVoid);
     }
 
